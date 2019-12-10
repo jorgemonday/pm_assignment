@@ -20,6 +20,12 @@
 # -----------------------------------------------------------
 
 import io
+import sys
+
+# require a minimum version of python to guarantee compatability
+MIN_PYTHON = (2, 7)
+if sys.version_info < MIN_PYTHON:
+    sys.exit("Sorry, Python %s.%s or later is required.\n" % MIN_PYTHON)
 
 # These variables will hold the final result
 result_day = None
@@ -33,7 +39,7 @@ try :
         
         for line in lines :
             
-            if len(line) > 20 : # aproximately 20 characters needed to contain the necessary data in a line
+            if len(line) > 20 : # aproximately 20 characters needed to contain the necessary data in a record
                 
                 try :
                     day_of_month = int(line[0:5].strip()) # if not a valid data record, it will fail and move on to the next line.                    
@@ -44,7 +50,6 @@ try :
                     if not result_spread :
                         result_spread = day_temp_spread
                         result_day = day_of_month
-                        
                     else :
                         # compare and declare a new winner if this is a lower spread value
                         if day_temp_spread < result_spread : 
