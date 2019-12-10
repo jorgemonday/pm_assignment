@@ -17,16 +17,26 @@
 # and ‘against’ goals.
 #
 # Jorge Rosas
-# December 9, 2019
+# https://github.com/jorgemonday
 # -----------------------------------------------------------
 
 import io
 import sys
 
-# require a minimum version of python to guarantee compatability
-MIN_PYTHON = (2, 7)
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Sorry, Python %s.%s or later is required.\n" % MIN_PYTHON)
+# Application constants
+MIN_PYTHON_VERSION = (2, 7)
+DATA_FILE_NAME = 'soccer.dat'
+RECORD_MINIMUM_NUM_CHARACTERS = 53 # If less, not a valid record
+RECORD_START_POSITION_TEAM_NAME = 7
+RECORD_END_POSITION_TEAM_NAME = 21
+RECORD_START_POSITION_GOALS_FOR = 43
+RECORD_END_POSITION_GOALS_FOR = 46
+RECORD_START_POSITION_GOALS_AGAINST = 50
+RECORD_END_POSITION_GOALS_AGAINST = 53
+
+# Require a minimum version of python to guarantee compatability
+if sys.version_info < MIN_PYTHON_VERSION:
+    sys.exit("Sorry, Python %s.%s or later is required.\n" % MIN_PYTHON_VERSION)
 
 # These variables will hold the final result
 result_team = None
@@ -34,18 +44,18 @@ result_spread = None
 
 try :
     # open the file in read only mode
-    with io.open('soccer.dat', mode='r', encoding='us-ascii') as soccer_file :                 
+    with io.open(DATA_FILE_NAME, mode='r', encoding='us-ascii') as soccer_file :                 
         
         lines = [line.rstrip('\n') for line in soccer_file]     
         
         for line in lines :
             
-            if len(line) > 53 : # number of characters needed to contain the necessary data in a record
+            if len(line) > RECORD_MINIMUM_NUM_CHARACTERS :
                 
-                try :
-                    team_name = line[7:21].strip() # if not a valid data record, it will fail and move on to the next line.                    
-                    goals_for = int(line[43:46].strip())
-                    goals_against = int(line[50:53].strip())
+                try : # if not a valid data record, it will fail and move on to the next line.                    
+                    team_name = line[RECORD_START_POSITION_TEAM_NAME : RECORD_END_POSITION_TEAM_NAME].strip() 
+                    goals_for = int(line[RECORD_START_POSITION_GOALS_FOR : RECORD_END_POSITION_GOALS_FOR].strip())
+                    goals_against = int(line[RECORD_START_POSITION_GOALS_AGAINST : RECORD_END_POSITION_GOALS_AGAINST].strip())
                     goal_spread = goals_for - goals_against
 
                     if goal_spread < 0 :
@@ -55,7 +65,7 @@ try :
                         result_spread = goal_spread
                         result_team = team_name                        
                     else :
-                        # compare and declare a new winner if this is a lower spread value
+                        # compare and set a new value if this is a lower spread
                         if goal_spread < result_spread : 
                             result_spread = goal_spread
                             result_team = team_name
@@ -63,7 +73,7 @@ try :
                 except ValueError : # not a valid line for this application
                     continue
 
-    # compute finished, display the day of the month with lowest spread and quit.
+    # compute finished, display the team with the lowest spread and quit.
     print(str(result_team))
     quit()
 

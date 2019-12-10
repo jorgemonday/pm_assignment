@@ -15,43 +15,55 @@
 # day number (column one) with the smallest temperature spread (the maximum temperature is the second column, 
 # the minimum the third column).
 #
+# 
 # Jorge Rosas
-# December 9, 2019
+# https://github.com/jorgemonday
 # -----------------------------------------------------------
 
 import io
 import sys
 
-# require a minimum version of python to guarantee compatability
-MIN_PYTHON = (2, 7)
-if sys.version_info < MIN_PYTHON:
-    sys.exit("Sorry, Python %s.%s or later is required.\n" % MIN_PYTHON)
+# Application constants
+MIN_PYTHON_VERSION = (2, 7)
+DATA_FILE_NAME = 'w_data (5).dat'
+RECORD_MINIMUM_NUM_CHARACTERS = 20 # If less, not a valid record
+RECORD_START_POSITION_DAY = 0
+RECORD_END_POSITION_DAY = 5
+RECORD_START_POSITION_LOW_TEMP = 12
+RECORD_END_POSITION_LOW_TEMP = 17
+RECORD_START_POSITION_HIGH_TEMP = 6
+RECORD_END_POSITION_HIGH_TEMP = 11
+
+# Require a minimum version of python to guarantee compatability
+if sys.version_info < MIN_PYTHON_VERSION:
+    sys.exit("Sorry, Python %s.%s or later is required.\n" % MIN_PYTHON_VERSION)
 
 # These variables will hold the final result
 result_day = None
 result_spread = None
 
+
 try :
     # open the file in read only mode
-    with io.open('w_data (5).dat', mode='r', encoding='us-ascii') as weather_file :                 
+    with io.open(DATA_FILE_NAME, mode='r', encoding='us-ascii') as weather_file :                 
         
         lines = [line.rstrip('\n') for line in weather_file]     
         
         for line in lines :
             
-            if len(line) > 20 : # aproximately 20 characters needed to contain the necessary data in a record
+            if len(line) > RECORD_MINIMUM_NUM_CHARACTERS : 
                 
-                try :
-                    day_of_month = int(line[0:5].strip()) # if not a valid data record, it will fail and move on to the next line.                    
-                    day_low_temp = int(line[12:17].replace('*','').strip())
-                    day_high_temp = int(line[6:11].replace('*','').strip())
+                try : # if not a valid data record, fail and move on to the next line.                    
+                    day_of_month = int(line[RECORD_START_POSITION_DAY : RECORD_END_POSITION_DAY].strip()) 
+                    day_low_temp = int(line[RECORD_START_POSITION_LOW_TEMP : RECORD_END_POSITION_LOW_TEMP].replace('*','').strip())
+                    day_high_temp = int(line[RECORD_START_POSITION_HIGH_TEMP : RECORD_END_POSITION_HIGH_TEMP].replace('*','').strip())
                     day_temp_spread = day_high_temp - day_low_temp
 
                     if not result_spread :
                         result_spread = day_temp_spread
                         result_day = day_of_month
                     else :
-                        # compare and declare a new winner if this is a lower spread value
+                        # compare and set a new value if this is a lower spread
                         if day_temp_spread < result_spread : 
                             result_spread = day_temp_spread
                             result_day = day_of_month
